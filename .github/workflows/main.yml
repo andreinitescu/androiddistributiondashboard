@@ -14,7 +14,7 @@ jobs:
         curl -X GET https://dl.google.com/android/studio/metadata/distributions.json -o data.json
         git config --global user.name "GitHub Action"
         git config --global user.email "test@gmail.com"
-        git add availableLanguages.json
+        git add data.json
         git commit -m "Fetching file"
         git push
 
