@@ -6,13 +6,32 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - name: Create Test Files
-        run: |
-          touch test1.txt
-          echo "Test 1" >> test1.txt
-          mkdir folder1
-          touch folder1/test2.txt
-          echo "Test 2" >> folder1/test2.txt
-          touch folder1/test3.txt
-          echo "Test 3" >> folder1/test3.txt
+    - uses: actions/checkout@v2
+    - shell: bash
+      # env:
+      #   SECRETPAT: ${{ secrets.CROWDINPAT_availableLanguages }}
+      run: |
+        curl -X GET https://dl.google.com/android/studio/metadata/distributions.json -o data.json
+        git config --global user.name "GitHub Action"
+        git config --global user.email "test@gmail.com"
+        git add availableLanguages.json
+        git commit -m "Fetching file"
+        git push
+
+      # - uses: actions/checkout@v2
+      # - uses: actions/setup-node@v2
+      #   with:
+      #     node-version: "16"
+      # - run: npm install
+      # - run: node path-to-your-script.js
+
+      # - uses: actions/checkout@v1
+      # - name: Create Test Files
+      #   run: |
+      #     touch test1.txt
+      #     echo "Test 1" >> test1.txt
+      #     mkdir folder1
+      #     touch folder1/test2.txt
+      #     echo "Test 2" >> folder1/test2.txt
+      #     touch folder1/test3.txt
+      #     echo "Test 3" >> folder1/test3.txt
