@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible"
+          content="IE=edge">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+
+    <link rel="stylesheet"
+          id="ss1"
+          href="https://dl.google.com/android/studio/metadata/distributions.json">
+    </script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+          crossorigin="anonymous">
+
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <script src="https://unpkg.com/chart.js-plugin-labels-dv/dist/chartjs-plugin-labels.min.js"></script> -->
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>
+
+    <style>
+        html,
+        body {
+            height: 100%;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .flex-fill1 {
+            flex: 1 1 0;
+        }
+
+        .minh-0 {
+            min-height: 0;
+        }
+
+        .flex-auto {
+            flex: 0 0 0;
+        }
+
+        .selected-release-panel {
+            min-width: 500px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="d-flex flex-column h-100 p-4">
+        <h3 id="title"
+            class="align-self-center"></h3>
+        <span class="align-self-center text-muted text-small"
+              data-bind="visible: !selectedRelease()">Select a release to see details</span>
+
+        <div class="d-flex flex-row flex-fill p-3 minh-0 mt-3">
+            <div class="flex-fill d-flex"
+                 id="chart-container">
+            </div>
+
+            <div class="flex-auto d-flex minh-0">
+                <div class="d-flex">
+                    <div data-bind="with: selectedRelease, visible: selectedRelease"
+                         class="overflow-auto selected-release-panel border-start">
+                        <table class="ms-3 me-5">
+                            <thead>
+                                <tr>
+                                    <th data-bind="text: ReleaseTitleConverter.convert($data)"></th>
+                                </tr>
+                            </thead>
+                            <tbody data-bind="foreach: descriptionBlocks">
+                                <tr>
+                                    <td>
+                                        <h6 data-bind="text: title"
+                                            class="d-block mt-3"></h6>
+                                        <span data-bind="html:body"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- <div>
+        <canvas id="chart"></canvas>
+    </div> -->
+    <script>
+        class ReleaseTitleConverter {
+            static convert(release) {
+                return `${release.name} - Android ${release.version} (API ${release.apiLevel})`;
+            }
+        }
+    </script>
+
+    <script type="module">
+        import getReleaseListAsync from './index.js';
+
+        const releaseList = await getReleaseListAsync();
+        const pList = releaseList.map(r => r.distributionPercentage);
+        const pList2 = pList.map(p => p.distributionPercentage);
+        const pQ = releaseList.find(r => r.name == "Q").distributionPercentage;
+        const pR = releaseList.find(r => r.name == "R").distributionPercentage;
+        const sum = pList.reduce((s, p) => s + p);
+
+        console.log("Q:%f %f R: %f %f", 50.8, pQ, 24.3, pR);
+
+        const title = `Android distribution in ${getCurrentDateDisplayName()}`;
+        $('#title').text(title);
+
+        class MainViewModel {
+            constructor() {
+                this.releaseList = ko.observable([]);
+                this.selectedRelease = ko.observable();
+            }
+        }
+
+        const mainViewModel = new MainViewModel();
+
+        ko.applyBindings(mainViewModel);
+
+        // https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/chart/reflow-true/
+
+        const chart = renderPieChart({
+            chartContainerId: 'chart-container',
+            releaseList,
+            onItemSelected: showSelectedReleaseInfo
+        });
+
+        function showSelectedReleaseInfo(release) {
+            mainViewModel.selectedRelease(release);
+            chart.reflow();
+        }
+
+        function getCurrentDateDisplayName() {
+            const today = new Date();
+            return today.toLocaleString('en-US', { year: 'numeric', month: 'long' });
+        }
+
+        function renderStackedBarChar({ chartContainerId, releaseList, onItemSelected }) {
+            return Highcharts.chart(chartContainerId, {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Stacked column chart'
+                },
+                xAxis: {
+                    categories: ['Android release']
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'aa'
+                    }
+                },
+                tooltip: {
+                    pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.percentage:.0f}%)<br/>',
+                    shared: true
+                },
+                plotOptions: {
+                    column: {
+                        stacking: 'percent'
+                    }
+                },
+                series: releaseList.map(release => ({ name: release.name, data: [release.distributionPercentage] }))
+            });
+        }
+
+        function renderPieChart({ chartContainerId, releaseList, onItemSelected }) {
+            return Highcharts.chart(chartContainerId, {
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie',
+                    /*                    events: {
+                                           selection: onItemSelected
+                                       } */
+                },
+                title: {
+                    text: ''
+                },
+                tooltip: {
+                    pointFormat: '<b>{point.percentage:.1f}%</b>'
+                },
+                accessibility: {
+                    point: {
+                        valueSuffix: '%'
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name} {point.version}</b>: {point.percentage:.1f}%'
+                        }
+                    }
+                },
+                series: [{
+                    colorByPoint: true,
+                    data: releaseList.map(r => ({ name: `${r.name} - Android ${r.version}`, y: r.distributionPercentage })),
+                    point: {
+                        events: {
+                            click: function (event) {
+                                const item = releaseList[this.x];
+                                onItemSelected(item);
+                            }
+                        }
+                    }
+                }]
+                /*  series: [{
+                     name: 'Brands',
+                     colorByPoint: true,
+                     data: [{
+                         name: 'Chrome',
+                         y: 61.41,
+                         sliced: true,
+                         selected: true
+                     }, {
+                         name: 'Internet Explorer',
+                         y: 11.84
+                     }, {
+                         name: 'Firefox',
+                         y: 10.85
+                     }, {
+                         name: 'Edge',
+                         y: 4.67
+                     }, {
+                         name: 'Safari',
+                         y: 4.18
+                     }, {
+                         name: 'Sogou Explorer',
+                         y: 1.64
+                     }, {
+                         name: 'Opera',
+                         y: 1.6
+                     }, {
+                         name: 'QQ',
+                         y: 1.2
+                     }, {
+                         name: 'Other',
+                         y: 2.61
+                     }]
+                 }] */
+            });
+        }
+
+        function renderChart2(releaseList) {
+            const releaseNameList = releaseList.map(r => r.name);
+            const releaseDistributionPercentageList = releaseList.map(r => r.distributionPercentage);
+            /* 
+                        function getRandomColor() {
+                            var letters = '0123456789ABCDEF'.split('');
+                            var color = '#';
+                            for (var i = 0; i < 6; i++) {
+                                color += letters[Math.floor(Math.random() * 16)];
+                            }
+                            return color;
+                        } */
+
+            function getRandomColor() {
+                var r = Math.floor(Math.random() * 255);
+                var g = Math.floor(Math.random() * 255);
+                var b = Math.floor(Math.random() * 255);
+                return "rgba(" + r + "," + g + "," + b + ", 0.5)";
+            }
+
+            function getRandomColors(colorCount) {
+                const result = [];
+                for (let i = 0; i < colorCount; i++) {
+                    result.push(getRandomColor());
+                }
+                return result;
+            }
+
+            const data = {
+                labels: releaseNameList,
+                datasets: [{
+                    label: 'Android Release Distribution',
+                    data: releaseDistributionPercentageList,
+                    backgroundColor: getRandomColors(releaseList.length),
+                    borderColor: getRandomColors(releaseList.length),
+                    borderWidth: 1
+                }]
+            };
+
+            const config = {
+                type: 'doughnut',
+                data: data,
+                options: {
+                    plugins: {
+                        labels: {
+                            // render 'label', 'value', 'percentage', 'image' or custom function, default is 'percentage'
+                            render: 'label',
+                        }
+                    }
+                }
+            };
+
+            const myChart = new Chart(
+                document.getElementById('chart'),
+                config
+            );
+        }
+    </script>
+</body>
+
+</html>
