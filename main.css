@@ -1,0 +1,26 @@
+html,
+body {
+    height: 100%;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.flex-fill1 {
+    flex: 1 1 0;
+}
+
+.minh-0 {
+    min-height: 0;
+}
+
+.flex-auto {
+    flex: 0 0 0;
+}
+
+.selected-release-panel {
+    min-width: 500px;
+}
+
+.table tbody tr.highlight td {
+    background-color: aqua;
+}
