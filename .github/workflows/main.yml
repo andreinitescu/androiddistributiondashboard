@@ -1,5 +1,5 @@
 on:
-  schedule:
+  #schedule:
   # See https://crontab.guru/#0_0_1_*/1_*
   #  - cron: "0 0 1 */1 *"
   push:
