@@ -24,10 +24,10 @@ class Mapper {
      */
     static mapToAndroidRelease(release, allReleases) {
         const distributionPercentage = release.distributionPercentage * 100.0;
-
-        const cummulativeDistributionPercentage = allReleases
-            .filter(r => r.apiLevel >= release.apiLevel)
-            .reduce((sum, release) => sum + release.distributionPercentage, 0) * 100.0;
+        
+        const cummulativeDistributionPercentage = (1 - allReleases
+            .filter(r => r.apiLevel < release.apiLevel)
+            .reduce((sum, release) => sum + release.distributionPercentage, 0)) * 100.0;
 
         return new AndroidRelease({
             ...release,
