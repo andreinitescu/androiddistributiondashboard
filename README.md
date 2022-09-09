@@ -8,6 +8,6 @@ Some time ago, Google removed the pie chart showing the distribution of the Andr
 > You can find platform version information in Android Studio's Create New Project wizard.
 
 
-If you are an Android developer which does not have Android Studio installed, you can instead go to:
+I made a web tool which gets and displays the data from the same source as in Android Studio:
 
 https://andreinitescu.androiddistributiondashboard.github.io
