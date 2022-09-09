@@ -4,7 +4,7 @@ import AndroidReleaseDescription from "./models/AndroidReleaseDescription.js";
 export default class AndroidReleaseServiceClient {
     async getReleaseListAsync() {
         const releaseDataList = await this._getRemoteDataAsync();
-        return releaseDataList.map(Mapper.mapToAndroidRelease);
+        return releaseDataList.map((releaseData) => Mapper.mapToAndroidRelease(releaseData, releaseDataList));
     }
 
     /** @returns {Promise<Array>} */
@@ -16,8 +16,25 @@ export default class AndroidReleaseServiceClient {
 }
 
 class Mapper {
-    static mapToAndroidRelease(release) {
-        return new AndroidRelease({ ...release, descriptions: release.descriptionBlocks.map(Mapper.mapToAndroidReleaseDescription) })
+    /**
+     * 
+     * @param {AndroidRelease} release 
+     * @param {AndroidRelease[]} allReleases 
+     * @returns 
+     */
+    static mapToAndroidRelease(release, allReleases) {
+        const distributionPercentage = release.distributionPercentage * 100.0;
+
+        const cummulativeDistributionPercentage = allReleases
+            .filter(r => r.apiLevel >= release.apiLevel)
+            .reduce((sum, release) => sum + release.distributionPercentage, 0) * 100.0;
+
+        return new AndroidRelease({
+            ...release,
+            distributionPercentage,
+            cummulativeDistributionPercentage,
+            descriptions: release.descriptionBlocks.map(Mapper.mapToAndroidReleaseDescription)
+        })
     }
 
     static mapToAndroidReleaseDescription(descriptionBlock) {

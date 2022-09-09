@@ -1,4 +1,5 @@
 import AndroidReleaseServiceClient from "./AndroidReleaseServiceClient.js";
+import FloatToStringConverter from "./converters/FloatToStringConverter.js";
 import ReleaseTitleConverter from "./converters/ReleaseTitleConverter.js";
 import MainViewModel from "./viewModels/MainViewModel.js";
 
@@ -14,6 +15,7 @@ function initUI() {
     $('#title').text(title);
 
     window.ReleaseTitleConverter = ReleaseTitleConverter;
+    window.FloatToStringConverter = FloatToStringConverter;
 }
 
 async function createMainViewModel() {

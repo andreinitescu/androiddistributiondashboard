@@ -19,21 +19,31 @@
 
 <body>
     <div class="d-flex flex-column h-100 p-4">
-        <h3 id="title" class="align-self-center"></h3>
-        <div class="d-flex flex-row flex-fill p-3 minh-0 mt-3">
-            <div class="flex-fill" data-bind="template: { name: 'release-list-panel' }"></div>
+        <h3 id="title" class="align-self-center mb-5"></h3>
+        <div class="d-flex flex-row flex-fill minh-0 mt-3">
+            <div class="d-flex flex-column flex-fill">
+                <div class="d-flex flex-column flex-fill">
+                    <div data-bind="template: { name: 'release-list-panel' }"></div>
+                    <p class="small text-muted flex-auto pt-2">Select a release for more info.</p>
+                </div>
+                <p class="small text-muted flex-auto pt-2"><i class="fa-solid fa-circle-info"></i>Data is from the same source as in Android Studio.</p>
+            </div>
             <div class="flex-auto d-flex minh-0" data-bind="template: { name: 'selected-release-panel' }"></div>
         </div>
     </div>
 
     <script type="text/html" id="release-list-panel">
-        <table data-toggle="table" data-search="false" data-sortable="true" data-bind="bootstrapTable: { source: releaseList, selectedItem: selectedRelease }">
+        <table data-toggle="table" data-search="false" data-sortable="true" 
+            data-sort-name="apiLevel"
+            data-sort-order="desc"
+            data-bind="bootstrapTable: { source: releaseList, selectedItem: selectedRelease }">
             <thead>
                 <tr>
                     <th data-field="version" data-sortable="true">Version</th>
                     <th data-field="name" data-sortable="true">Name</th>
                     <th data-field="apiLevel" data-sortable="true">API</th>
-                    <th data-field="distributionPercentage" data-sortable="true">Distribution</th>
+                    <th data-field="cummulativeDistributionPercentage" data-sortable="true" data-formatter="FloatToStringConverter.convert">Cummulative Distribution</th>
+                    <th data-field="distributionPercentage" data-sortable="true" data-formatter="FloatToStringConverter.convert">Distribution</th>
                 </tr>
             </thead>
         </table>
@@ -60,10 +70,8 @@
         </div>
     </script>
 
-
     <script src="./koBindings.js"></script>
     <script type="module" src="./app.js"></script>
-
 </body>
 
 </html>
