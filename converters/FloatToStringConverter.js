@@ -4,6 +4,6 @@ export default class FloatToStringConverter {
      * @returns 
      */
     static convert(f) {
-        return `${f.toFixed(2)}%`;
+        return `${f.toFixed(1)}%`;
     }
 }
