@@ -11,10 +11,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - shell: bash
-      run: |
+      run: |-
         curl -X GET https://dl.google.com/android/studio/metadata/distributions.json -o data.json
-        git config user.name "GitHub Action"
+    - name: Add file
+      run: |-
+        git diff
+        git config user.name "Automated"
         git config user.email "---"
-        git add -A
-        git commit -m "Fetched latest distribution data"
+        git diff --quiet || (git add -A && git commit -m "Updated with latest")
         git push
