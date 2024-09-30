@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - shell: bash
       run: |-
         curl -X GET https://dl.google.com/android/studio/metadata/distributions.json -o data.json
