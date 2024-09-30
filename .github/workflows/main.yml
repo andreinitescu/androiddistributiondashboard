@@ -14,6 +14,12 @@ jobs:
     - shell: bash
       run: |-
         curl -X GET https://dl.google.com/android/studio/metadata/distributions.json -o data.json
+
+    - name: Write current date to file
+      run: |-
+        echo "Fetching date and saving to file."
+        date +"%Y-%m-%d" > current_date.txt
+        
     - name: Add file
       run: |-
         git diff
